@@ -4,13 +4,30 @@ import { afterEach, expect, vi } from 'vitest';
 
 expect.extend(matchers);
 
+/**
+ * Global after-each teardown.
+ *
+ * Runs automatically after every test to prevent state leaking between cases:
+ * - `cleanup()` unmounts any React trees rendered with `@testing-library/react`
+ * - `vi.clearAllMocks()` resets call counts and return values on all mocks
+ * - `vi.unstubAllGlobals()` restores any globals stubbed with `vi.stubGlobal()`
+ */
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
   vi.unstubAllGlobals();
 });
 
-// Mock Lucide icons to prevent SVG bloat in snapshots
+/**
+ * Lucide React icon mock.
+ *
+ * Replaces every named icon export with a lightweight `<div>` stub that carries
+ * a `data-testid="icon-<IconName>"` attribute. This keeps snapshots readable
+ * and avoids rendering full SVG markup in tests.
+ *
+ * @example
+ * expect(screen.getByTestId('icon-ChevronDown')).toBeInTheDocument();
+ */
 vi.mock('lucide-react', async () => {
   const actual = await vi.importActual('lucide-react');
   return Object.keys(actual).reduce((acc, curr) => {
@@ -19,62 +36,33 @@ vi.mock('lucide-react', async () => {
   }, {});
 });
 
-// ---------------------------------------------------------------------------
-// Global Supabase client mock
-// ---------------------------------------------------------------------------
-// Provides a chainable stub for supabase.from() queries and stubs for all
-// supabase.auth.* methods used across the test suite.
-// Individual test files can override specific methods with:
-//   vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce(...)
-// ---------------------------------------------------------------------------
-vi.mock('./src/lib/supabase.js', () => {
-  const queryChain = {
-    select: vi.fn(),
-    insert: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    eq: vi.fn(),
-    neq: vi.fn(),
-    ilike: vi.fn(),
-    gte: vi.fn(),
-    lte: vi.fn(),
-    order: vi.fn(),
-    single: vi.fn(),
-    limit: vi.fn(),
-  };
-
-  // Make every chain method return the chain so calls can be composed
-  Object.keys(queryChain).forEach((key) => {
-    queryChain[key].mockReturnValue(queryChain);
-  });
-
-  return {
-    supabase: {
-      auth: {
-        signUp: vi.fn(),
-        signInWithPassword: vi.fn(),
-        signOut: vi.fn(),
-        getSession: vi.fn(),
-        onAuthStateChange: vi.fn(() => ({
-          data: { subscription: { unsubscribe: vi.fn() } },
-        })),
-      },
-      from: vi.fn(() => queryChain),
-      _queryChain: queryChain,
-    },
-  };
-});
-
-// Initialize Browser API Mocks
+/**
+ * Browser API mocks for the jsdom environment.
+ *
+ * jsdom does not fully implement browser APIs. This block shims the ones most
+ * commonly used in the app so tests can interact with them without errors.
+ *
+ * Mocked APIs:
+ * - `window.localStorage` — in-memory key/value store; resets between tests
+ *   via `vi.clearAllMocks()` in the afterEach above
+ * - `window.location` — stubs `reload`, `assign`, and `replace` so navigation
+ *   calls in components can be asserted with `expect(...).toHaveBeenCalled()`
+ */
 if (typeof window !== 'undefined') {
-  // Mock localStorage
   let store = {};
+
   Object.defineProperty(window, 'localStorage', {
     value: {
+      /** @param {string} key */
       getItem: (key) => store[key] || null,
+      /**
+       * @param {string} key
+       * @param {string} value
+       */
       setItem: (key, value) => {
         store[key] = String(value);
       },
+      /** @param {string} key */
       removeItem: (key) => {
         delete store[key];
       },
@@ -91,7 +79,24 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// Mock React Router navigation and error hooks
+/**
+ * React Router mock.
+ *
+ * Spreads the real `react-router` module and overrides only the hooks and
+ * components that trigger navigation side-effects during tests:
+ *
+ * - `useNavigate` — returns a fresh `vi.fn()` so push/replace calls can be
+ *   asserted without an actual router context
+ * - `useRouteError` — returns `undefined` by default; override per-test with
+ *   `vi.mocked(useRouteError).mockReturnValue(new Error('...'))`
+ * - `Navigate` — renders nothing, preventing redirects from crashing tests
+ *   that render components outside a full router tree
+ *
+ * @example
+ * const navigate = vi.fn();
+ * vi.mocked(useNavigate).mockReturnValue(navigate);
+ * expect(navigate).toHaveBeenCalledWith('/dashboard');
+ */
 vi.mock('react-router', async () => {
   const actual = await vi.importActual('react-router');
   return {

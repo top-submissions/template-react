@@ -180,8 +180,8 @@ a hotel booking, causing manual overbooking errors across both branches.
 
 ## How
 
-- Availability is checked server-side at confirmation time, not on page
-  load, to avoid stale reads from concurrent bookings
+- Availability is checked at confirmation time, not on page load,
+  to avoid stale reads from concurrent bookings
 - The check is scoped to size category (Small / Medium / Large) rather
   than individual cage IDs to match how receptionists think about capacity
 
@@ -197,7 +197,7 @@ a hotel booking, causing manual overbooking errors across both branches.
 ## Pre-Merge Checklist
 
 - [ ] Synced with `main` before opening this PR (`git fetch origin && git merge origin/main`)
-- [ ] All tests pass locally (`npm test` in both `client/` and `server/`)
+- [ ] All tests pass locally (`npm test`)
 - [ ] No `console.log` left in production code
 - [ ] Self-reviewed my own diff before requesting review
 - [ ] Added or updated tests for the changes made

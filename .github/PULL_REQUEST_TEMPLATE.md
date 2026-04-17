@@ -36,7 +36,7 @@
 ## Pre-Merge Checklist
 
 - [ ] Synced with `main` before opening this PR (`git fetch origin && git merge origin/main`)
-- [ ] All tests pass locally (`npm test` in both `client/` and `server/`)
+- [ ] All tests pass locally (`npm test`)
 - [ ] No `console.log` left in production code
 - [ ] Self-reviewed my own diff before requesting review
 - [ ] Added or updated tests for the changes made
