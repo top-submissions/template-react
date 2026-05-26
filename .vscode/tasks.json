@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ── Development ────────────────────────────────────────────
+    {
+      "label": "💻 Dev: Start",
+      "type": "npm",
+      "script": "dev",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+
+    // ── Build ──────────────────────────────────────────────────
+    {
+      "label": "🏗️ Build",
+      "type": "npm",
+      "script": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "👁️ Preview",
+      "type": "npm",
+      "script": "preview",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+
+    // ── Testing ────────────────────────────────────────────────
+    {
+      "label": "🧪 Tests (watch)",
+      "type": "npm",
+      "script": "test:watch",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "🧪 Tests (run once)",
+      "type": "npm",
+      "script": "test:run",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "🧪 Tests (UI)",
+      "type": "npm",
+      "script": "test:ui",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+
+    // ── Code Quality ───────────────────────────────────────────
+    {
+      "label": "🔍 Lint",
+      "type": "npm",
+      "script": "lint",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🔧 Lint: Fix",
+      "type": "npm",
+      "script": "lint:fix",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "✨ Format",
+      "type": "npm",
+      "script": "format",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}
