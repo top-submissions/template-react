@@ -90,6 +90,30 @@
         "reveal": "always",
         "panel": "shared"
       }
+    },
+    {
+      "label": "🎨 Format: Check",
+      "type": "npm",
+      "script": "format:check",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+
+    // ── CI Verify (mirrors all CI jobs locally) ────────────────
+    {
+      "label": "✅ CI: Verify All",
+      "dependsOn": [
+        "🧪 Tests (run once)",
+        "🔍 Lint",
+        "🎨 Format: Check",
+        "🏗️ Build"
+      ],
+      "dependsOrder": "parallel",
+      "presentation": {
+        "reveal": "silent"
+      }
     }
   ]
 }
